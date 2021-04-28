@@ -103,7 +103,8 @@ namespace Tochka.JsonRpc.Client
             var content = CreateHttpContent(data);
             var httpResponseMessage = await Client.PostAsync((string) null, content, cancellationToken);
             context.WithHttpResponse(httpResponseMessage);
-            context.WithHttpContent(httpResponseMessage.Content);
+            var contentString = await GetContent(httpResponseMessage.Content);
+            context.WithHttpContent(httpResponseMessage.Content, contentString);
             var responseWrapper = await ParseBody(httpResponseMessage, cancellationToken);
             switch (responseWrapper)
             {
@@ -248,26 +249,60 @@ namespace Tochka.JsonRpc.Client
             return new StringContent(body, Encoding, JsonRpcConstants.ContentType);
         }
 
+        protected internal virtual async Task<string> GetContent(HttpContent content)
+        {
+            using (var stream = await content.ReadAsStreamAsync())
+            {
+                using (var streamReader = new StreamReader(stream, Encoding))
+                {
+                    return await streamReader.ReadToEndAsync();
+                }
+            }
+        }
+
         /// <summary>
         /// Parse single or batch response from HTTP body
         /// </summary>
         /// <param name="httpResponseMessage"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        protected internal virtual async Task<IResponseWrapper> ParseBody(HttpResponseMessage httpResponseMessage, CancellationToken cancellationToken)
+        protected internal virtual async Task<IResponseWrapper> ParseBodyAndSaveResponseContent(IJsonRpcCallContext context, HttpResponseMessage httpResponseMessage, CancellationToken cancellationToken)
         {
             using (var stream = await httpResponseMessage.Content.ReadAsStreamAsync())
             {
                 using (var streamReader = new StreamReader(stream, Encoding))
                 {
-                    using (var jsonReader = new JsonTextReader(streamReader))
-                    {
-                        log.LogTrace($"Parsing HTTP response body: {httpResponseMessage.Content.Headers.ContentLength} bytes");
-                        var json = await JToken.ReadFromAsync(jsonReader, cancellationToken);
-                        return json.ToObject<IResponseWrapper>(HeaderJsonRpcSerializer.Serializer);
-                    }
+                    var contentPart = await ReadFromStream(streamReader);
+                    streamReader.DiscardBufferedData();
+                    stream.Position = 0;
+                    context.WithHttpContent(httpResponseMessage.Content, contentPart);
+
+                    log.LogTrace($"Parsing HTTP response body: {httpResponseMessage.Content.Headers.ContentLength} bytes");
+                    return await ParseBody(streamReader, cancellationToken);
                 }
             }
+        }
+
+        protected internal virtual async Task<string> ReadFromStream(StreamReader streamReader)
+        {
+            var chars = new char[JsonRpcConstants.MaxLenghtLogging];
+            var read = await streamReader.ReadAsync(chars, 0, chars.Length);
+            return chars.ToString();
+        }
+
+        protected internal virtual async Task<IResponseWrapper> ParseBody(StreamReader streamReader, CancellationToken cancellationToken)
+        {
+            using (var jsonReader = new JsonTextReader(streamReader))
+            {
+                var json = await JToken.ReadFromAsync(jsonReader, cancellationToken);
+                return json.ToObject<IResponseWrapper>(HeaderJsonRpcSerializer.Serializer);
+            }
+        }
+
+        protected internal virtual async Task<IResponseWrapper> ParseBody(string contentString)
+        {
+            var json = JToken.Parse(contentString);
+            return json.ToObject<IResponseWrapper>(HeaderJsonRpcSerializer.Serializer);
         }
 
         protected internal virtual IJsonRpcCallContext CreateContext()
