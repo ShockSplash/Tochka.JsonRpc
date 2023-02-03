@@ -1,8 +1,9 @@
-using Tochka.JsonRpc.Client.Models;
+using Tochka.JsonRpc.Common.Models.Id;
 
-namespace Tochka.JsonRpc.Client.Services;
-
-public interface IJsonRpcIdGenerator
+namespace Tochka.JsonRpc.Client.Services
 {
-    IRpcId GenerateId();
+    public interface IJsonRpcIdGenerator
+    {
+        IRpcId GenerateId();
+    }
 }

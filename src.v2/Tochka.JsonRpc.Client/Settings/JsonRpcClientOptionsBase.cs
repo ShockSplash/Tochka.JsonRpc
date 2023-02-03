@@ -1,17 +1,21 @@
-namespace Tochka.JsonRpc.Client.Settings;
+using System;
 
-/// <summary>
-/// Base class for JSON Rpc client with sane default values
-/// </summary>
-public abstract record JsonRpcClientOptionsBase
+namespace Tochka.JsonRpc.Client.Settings
 {
     /// <summary>
-    /// HTTP endpoint
+    /// Base class for JSON Rpc client with sane default values
     /// </summary>
-    public virtual string Url { get; init; } = null!;
+    public abstract class JsonRpcClientOptionsBase
+    {
+        /// <summary>
+        /// HTTP endpoint
+        /// </summary>
+        public virtual string Url { get; set; }
 
-    /// <summary>
-    /// Request timeout, default is 10 seconds
-    /// </summary>
-    public virtual TimeSpan Timeout { get; init; } = TimeSpan.FromSeconds(10);
+        /// <summary>
+        /// Request timeout, default is 10 seconds
+        /// </summary>
+        public virtual TimeSpan Timeout { get; set; } = TimeSpan.FromSeconds(10);
+    }
+
 }
