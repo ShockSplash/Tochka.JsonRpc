@@ -1,0 +1,12 @@
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "boolField": true,
+    "stringField": "123",
+    "intField": 123,
+    "doubleField": 1.23,
+    "enumField": "two",
+    "nullableField": null
+  },
+  "id": 123
+}

@@ -10,6 +10,16 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tochka.JsonRpc.Common", "To
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tochka.JsonRpc.Common.Tests", "tests\Tochka.JsonRpc.Common.Tests\Tochka.JsonRpc.Common.Tests.csproj", "{7730EFE9-B6F6-443B-9A3A-2685E7AC44F1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tochka.JsonRpc.Client.Benchmarks", "tests\Tochka.JsonRpc.Client.Benchmarks\Tochka.JsonRpc.Client.Benchmarks.csproj", "{0E2D2CA1-D008-4534-85BC-A6D3E902A35B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tochka.JsonRpc.TestUtils", "tests\Tochka.JsonRpc.TestUtils\Tochka.JsonRpc.TestUtils.csproj", "{2E08AE3B-F932-44D2-93E3-4ABEE494F5B0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "old", "old", "{35E06942-1501-4A61-A6D3-F22D3AED9B19}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tochka.JsonRpc.Common.Old", "old\Tochka.JsonRpc.Common.Old\Tochka.JsonRpc.Common.Old.csproj", "{D4A28720-D20C-4222-9A28-3D83AEE8D826}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tochka.JsonRpc.Client.Old", "old\Tochka.JsonRpc.Client.Old\Tochka.JsonRpc.Client.Old.csproj", "{4110317A-53BD-48E5-9C49-8E89116D77A2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,9 +42,29 @@ Global
 		{7730EFE9-B6F6-443B-9A3A-2685E7AC44F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7730EFE9-B6F6-443B-9A3A-2685E7AC44F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7730EFE9-B6F6-443B-9A3A-2685E7AC44F1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0E2D2CA1-D008-4534-85BC-A6D3E902A35B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0E2D2CA1-D008-4534-85BC-A6D3E902A35B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0E2D2CA1-D008-4534-85BC-A6D3E902A35B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0E2D2CA1-D008-4534-85BC-A6D3E902A35B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2E08AE3B-F932-44D2-93E3-4ABEE494F5B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2E08AE3B-F932-44D2-93E3-4ABEE494F5B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2E08AE3B-F932-44D2-93E3-4ABEE494F5B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2E08AE3B-F932-44D2-93E3-4ABEE494F5B0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D4A28720-D20C-4222-9A28-3D83AEE8D826}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D4A28720-D20C-4222-9A28-3D83AEE8D826}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D4A28720-D20C-4222-9A28-3D83AEE8D826}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D4A28720-D20C-4222-9A28-3D83AEE8D826}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4110317A-53BD-48E5-9C49-8E89116D77A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4110317A-53BD-48E5-9C49-8E89116D77A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4110317A-53BD-48E5-9C49-8E89116D77A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4110317A-53BD-48E5-9C49-8E89116D77A2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{C9E47447-6C14-43E0-A970-EF30D6FFD3C2} = {7912296A-76BE-4656-9C10-C13004788691}
 		{7730EFE9-B6F6-443B-9A3A-2685E7AC44F1} = {7912296A-76BE-4656-9C10-C13004788691}
+		{0E2D2CA1-D008-4534-85BC-A6D3E902A35B} = {7912296A-76BE-4656-9C10-C13004788691}
+		{2E08AE3B-F932-44D2-93E3-4ABEE494F5B0} = {7912296A-76BE-4656-9C10-C13004788691}
+		{D4A28720-D20C-4222-9A28-3D83AEE8D826} = {35E06942-1501-4A61-A6D3-F22D3AED9B19}
+		{4110317A-53BD-48E5-9C49-8E89116D77A2} = {35E06942-1501-4A61-A6D3-F22D3AED9B19}
 	EndGlobalSection
 EndGlobal

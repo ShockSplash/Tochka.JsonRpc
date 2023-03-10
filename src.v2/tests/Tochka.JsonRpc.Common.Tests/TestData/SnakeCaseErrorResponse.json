@@ -1,0 +1,16 @@
+{
+  "jsonrpc": "2.0",
+  "error": {
+    "code": 456,
+    "message": "errorMessage",
+    "data": {
+      "bool_field": true,
+      "string_field": "123",
+      "int_field": 123,
+      "double_field": 1.23,
+      "enum_field": "two",
+      "nullable_field": null
+    }
+  },
+  "id": 123
+}

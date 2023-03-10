@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BenchmarkDotNet" Version="0.13.5" />
+    <PackageReference Include="BenchmarkDotNet.Diagnostics.Windows" Version="0.13.5" />
+    <PackageReference Include="Moq" Version="4.18.4" />
+    <PackageReference Include="RichardSzalay.MockHttp" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\old\Tochka.JsonRpc.Client.Old\Tochka.JsonRpc.Client.Old.csproj" />
+    <ProjectReference Include="..\..\Tochka.JsonRpc.Client\Tochka.JsonRpc.Client.csproj" />
+    <ProjectReference Include="..\Tochka.JsonRpc.TestUtils\Tochka.JsonRpc.TestUtils.csproj" />
+  </ItemGroup>
+
+</Project>
