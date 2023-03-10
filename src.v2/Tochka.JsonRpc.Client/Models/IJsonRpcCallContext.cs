@@ -10,19 +10,19 @@ namespace Tochka.JsonRpc.Client.Models
 {
     public interface IJsonRpcCallContext
     {
-        IUntypedCall SingleCall { get; }
-        List<IUntypedCall> BatchCall { get; }
+        IUntypedCall? SingleCall { get; }
+        List<IUntypedCall>? BatchCall { get; }
         int ExpectedBatchResponseCount { get; }
-        string HttpResponseInfo { get; }
-        string HttpContentInfo { get; }
-        string ErrorInfo { get; }
+        string? HttpResponseInfo { get; }
+        string? HttpContentInfo { get; }
+        string? ErrorInfo { get; }
 
         [SuppressMessage("Naming", "CA1716:Идентификаторы не должны совпадать с ключевыми словами")]
-        IError Error { get; }
+        IError? Error { get; }
 
-        IResponse SingleResponse { get; }
-        List<IResponse> BatchResponse { get; }
-        void WithRequestUrl(string requestUrl);
+        IResponse? SingleResponse { get; }
+        List<IResponse>? BatchResponse { get; }
+        void WithRequestUrl(string? requestUrl);
         void WithSingle(IUntypedCall singleCall);
         void WithBatch(List<IUntypedCall> batchCall);
         void WithHttpResponse(HttpResponseMessage httpResponseMessage);

@@ -6,12 +6,12 @@ using Tochka.JsonRpc.Common.Serializers;
 
 namespace Tochka.JsonRpc.Client.Models
 {
-    public class SingleJsonRpcResult : ISingleJsonRpcResult
+    internal class SingleJsonRpcResult : ISingleJsonRpcResult
     {
         private readonly IJsonRpcCallContext context;
         private readonly HeaderJsonRpcSerializer headerJsonRpcSerializer;
         private readonly IJsonRpcSerializer serializer;
-        private readonly IResponse response;
+        private readonly IResponse? response;
 
         public SingleJsonRpcResult(IJsonRpcCallContext context, HeaderJsonRpcSerializer headerJsonRpcSerializer, IJsonRpcSerializer serializer)
         {
@@ -21,20 +21,17 @@ namespace Tochka.JsonRpc.Client.Models
                 throw new ArgumentOutOfRangeException(nameof(context), "Expected single response");
             }
 
-            this.response = context.SingleResponse;
+            response = context.SingleResponse;
             this.headerJsonRpcSerializer = headerJsonRpcSerializer;
             this.serializer = serializer;
         }
 
-        public T GetResponseOrThrow<T>()
+        public T? GetResponseOrThrow<T>()
         {
-            if (response == null)
-            {
-                throw new JsonRpcException($"Expected successful response with [{typeof(T).Name}] params, got nothing", context);
-            }
-
             switch (response)
             {
+                case null:
+                    throw new JsonRpcException($"Expected successful response with [{typeof(T).Name}] params, got nothing", context);
                 case UntypedResponse untypedResponse:
                     return untypedResponse.Result.Deserialize<T>(serializer.Settings);
                 case UntypedErrorResponse untypedErrorResponse:
@@ -45,54 +42,41 @@ namespace Tochka.JsonRpc.Client.Models
             }
         }
 
-        public T AsResponse<T>()
+        public T? AsResponse<T>() => response switch
         {
-            if (response is UntypedResponse untypedResponse)
-            {
-                return untypedResponse.Result.Deserialize<T>(serializer.Settings);
-            }
-            return default(T);
-        }
+            UntypedResponse untypedResponse => untypedResponse.Result.Deserialize<T>(serializer.Settings),
+            _ => default
+        };
 
         public bool HasError() => response is UntypedErrorResponse;
 
-        public Error<JsonDocument> AsAnyError()
+        public Error<JsonDocument>? AsAnyError() => response switch
         {
-            if (response is UntypedErrorResponse untypedErrorResponse)
-            {
-                return untypedErrorResponse.Error;
-            }
+            UntypedErrorResponse untypedErrorResponse => untypedErrorResponse.Error,
+            _ => null
+        };
 
-            return null;
-        }
-
-        public Error<T> AsTypedError<T>()
+        public Error<T>? AsTypedError<T>() => response switch
         {
-            if (response is UntypedErrorResponse untypedErrorResponse)
+            UntypedErrorResponse untypedErrorResponse => new Error<T>()
             {
-                var error = untypedErrorResponse.Error;
-                var data = GetData<T>(error);
-                return new Error<T>()
-                {
-                    Code = error.Code,
-                    Message = error.Message,
-                    Data = data
-                };
-            }
+                Code = untypedErrorResponse.Error.Code,
+                Message = untypedErrorResponse.Error.Message,
+                Data = GetData<T>(untypedErrorResponse.Error)
+            },
+            _ => null
+        };
 
-            return null;
-        }
-
-        private T GetData<T>(Error<JsonDocument> error)
+        private T? GetData<T>(Error<JsonDocument> error)
         {
             if (error.Data == null)
             {
                 // if data was not present at all, do not throw
-                return default(T);
+                return default;
             }
 
             var data = error.Data.Deserialize<T>(serializer.Settings);
-            if (data.Equals(default(T)))
+            if (data.Equals(default(T))) // ask Rast - что за ошибка?
             {
                 // if user serializer failed: maybe this is server error, try header serializer
                 data = error.Data.Deserialize<T>(headerJsonRpcSerializer.Settings);
@@ -101,9 +85,6 @@ namespace Tochka.JsonRpc.Client.Models
             return data;
         }
 
-        public Error<ExceptionInfo> AsErrorWithExceptionInfo()
-        {
-            return AsTypedError<ExceptionInfo>();
-        }
+        public Error<ExceptionInfo>? AsErrorWithExceptionInfo() => AsTypedError<ExceptionInfo>();
     }
 }

@@ -8,7 +8,6 @@ namespace Tochka.JsonRpc.Common.Serializers
     public class CamelCaseJsonRpcSerializer : IJsonRpcSerializer
     {
         public JsonSerializerOptions Settings => SettingsInstance;
-        // public JsonSerializer Serializer => SerializerInstance;
 
         private static readonly JsonSerializerOptions SettingsInstance = new()
         {
@@ -19,7 +18,5 @@ namespace Tochka.JsonRpc.Common.Serializers
             },
             WriteIndented = true
         };
-
-        // private static readonly JsonSerializer SerializerInstance = JsonSerializer.Create(SettingsInstance);
     }
 }

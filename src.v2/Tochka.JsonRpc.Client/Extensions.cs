@@ -1,33 +1,40 @@
-using System;
-using System.Collections;
-using System.Net;
-using System.Net.Http;
+using System.Diagnostics.CodeAnalysis;
+using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Tochka.JsonRpc.Client.Services;
-using Tochka.JsonRpc.Common.Models.Request.Wrappers;
 using Tochka.JsonRpc.Common.Serializers;
 
 namespace Tochka.JsonRpc.Client
 {
+    [PublicAPI]
     public static class Extensions
     {
-        public static IHttpClientBuilder AddJsonRpcClient<TClient, TImplementation>(this IServiceCollection services, Action<IServiceProvider, HttpClient> configureClient=null)
-        where TClient : class, IJsonRpcClient
-        where TImplementation : JsonRpcClientBase, TClient
+        public static IHttpClientBuilder AddJsonRpcClient<TClient, TImplementation>(this IServiceCollection services)
+            where TClient : class, IJsonRpcClient
+            where TImplementation : JsonRpcClientBase, TClient =>
+            AddJsonRpcClient<TClient, TImplementation>(services, static (_, _) => { });
+
+        public static IHttpClientBuilder AddJsonRpcClient<TClient, TImplementation>(this IServiceCollection services, Action<IServiceProvider, HttpClient> configureClient)
+            where TClient : class, IJsonRpcClient
+            where TImplementation : JsonRpcClientBase, TClient
         {
             services.TryAddSingleton<IJsonRpcIdGenerator, JsonRpcIdGenerator>();
             services.TryAddSingleton<HeaderJsonRpcSerializer>();
-            var builder = services.AddHttpClient<TClient, TImplementation>(configureClient ?? ((s, c) => { }));
+            var builder = services.AddHttpClient<TClient, TImplementation>(configureClient);
             return builder;
         }
 
-        public static IHttpClientBuilder AddJsonRpcClient<TClient>(this IServiceCollection services, Action<IServiceProvider, HttpClient> configureClient = null)
+        public static IHttpClientBuilder AddJsonRpcClient<TClient>(this IServiceCollection services)
+            where TClient : JsonRpcClientBase =>
+            AddJsonRpcClient<TClient>(services, static (_, _) => { });
+
+        public static IHttpClientBuilder AddJsonRpcClient<TClient>(this IServiceCollection services, Action<IServiceProvider, HttpClient> configureClient)
             where TClient : JsonRpcClientBase
         {
             services.TryAddSingleton<IJsonRpcIdGenerator, JsonRpcIdGenerator>();
             services.TryAddSingleton<HeaderJsonRpcSerializer>();
-            var builder = services.AddHttpClient<TClient>(configureClient ?? ((s, c) => { }));
+            var builder = services.AddHttpClient<TClient>(configureClient);
             return builder;
         }
     }

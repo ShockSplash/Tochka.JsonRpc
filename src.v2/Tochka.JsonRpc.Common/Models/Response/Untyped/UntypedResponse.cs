@@ -18,6 +18,6 @@ namespace Tochka.JsonRpc.Common.Models.Response.Untyped
         /// Set on deserialization. JSON content corresponding to id property
         /// </summary>
         [JsonIgnore]
-        public JsonValue RawId { get; set; }
+        public string RawId { get; set; }
     }
 }

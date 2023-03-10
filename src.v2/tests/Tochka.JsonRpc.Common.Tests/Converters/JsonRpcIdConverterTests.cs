@@ -73,7 +73,7 @@ namespace Tochka.JsonRpc.Common.Tests.Converters
             var result = jsonRpcIdConverter.Read(ref reader, Mock.Of<Type>(), new JsonSerializerOptions());
 
             result.Should().BeOfType<StringRpcId>()
-                .Subject.String.Should().Be(value);
+                .Subject.StringValue.Should().Be(value);
         }
 
         [TestCase(0)]
@@ -88,7 +88,7 @@ namespace Tochka.JsonRpc.Common.Tests.Converters
             var result = jsonRpcIdConverter.Read(ref reader, Mock.Of<Type>(), new JsonSerializerOptions());
 
             result.Should().BeOfType<NumberRpcId>()
-                .Subject.Number.Should().Be(value);
+                .Subject.NumberValue.Should().Be(value);
         }
 
         [TestCase(0L)]
@@ -103,7 +103,7 @@ namespace Tochka.JsonRpc.Common.Tests.Converters
             var result = jsonRpcIdConverter.Read(ref reader, Mock.Of<Type>(), new JsonSerializerOptions());
 
             result.Should().BeOfType<NumberRpcId>()
-                .Subject.Number.Should().Be(value);
+                .Subject.NumberValue.Should().Be(value);
         }
 
         [Test]

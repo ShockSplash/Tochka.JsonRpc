@@ -8,7 +8,7 @@ namespace Tochka.JsonRpc.Common.Models.Request
     [ExcludeFromCodeCoverage]
     public class Request<TParams> : ICall<TParams>
     {
-        public IRpcId Id { get; set; }
+        public IRpcId? Id { get; set; }
 
         public string Jsonrpc { get; set; } = JsonRpcConstants.Version;
 

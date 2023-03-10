@@ -14,27 +14,27 @@ using Tochka.JsonRpc.Common.Models.Response.Untyped;
 
 namespace Tochka.JsonRpc.Client.Models
 {
-    public class JsonRpcCallContext : IJsonRpcCallContext
+    internal class JsonRpcCallContext : IJsonRpcCallContext
     {
-        public string RequestUrl { get; private set; }
+        public string? RequestUrl { get; private set; }
 
-        public IUntypedCall SingleCall { get; private set; }
+        public IUntypedCall? SingleCall { get; private set; }
 
-        public List<IUntypedCall> BatchCall { get; private set; }
+        public List<IUntypedCall>? BatchCall { get; private set; }
 
         public int ExpectedBatchResponseCount { get; private set; }
 
-        public string HttpResponseInfo { get; private set; }
+        public string? HttpResponseInfo { get; private set; }
 
-        public string HttpContentInfo { get; private set; }
+        public string? HttpContentInfo { get; private set; }
 
-        public IResponse SingleResponse { get; private set; }
+        public IResponse? SingleResponse { get; private set; }
 
-        public List<IResponse> BatchResponse { get; private set; }
-        public IError Error { get; private set; }
-        public string ErrorInfo { get; private set; }
+        public List<IResponse>? BatchResponse { get; private set; }
+        public IError? Error { get; private set; }
+        public string? ErrorInfo { get; private set; }
 
-        public void WithRequestUrl(string requestUrl)
+        public void WithRequestUrl(string? requestUrl)
         {
             if (requestUrl == null)
             {
@@ -49,15 +49,12 @@ namespace Tochka.JsonRpc.Client.Models
             RequestUrl = requestUrl;
         }
 
-        public void WithSingle(IUntypedCall singleCall)
-        {
-            SingleCall = singleCall;
-        }
+        public void WithSingle(IUntypedCall singleCall) => SingleCall = singleCall;
 
         public void WithBatch(List<IUntypedCall> batchCall)
         {
             BatchCall = batchCall;
-            ExpectedBatchResponseCount = batchCall.Count(x => x is UntypedRequest);
+            ExpectedBatchResponseCount = batchCall.Count(static x => x is UntypedRequest);
         }
 
         public void WithHttpResponse(HttpResponseMessage httpResponseMessage)
@@ -78,7 +75,7 @@ namespace Tochka.JsonRpc.Client.Models
             }
 
             var contentLength = httpContent.Headers.ContentLength;
-            if (contentLength == null || contentLength == 0)
+            if (contentLength is null or 0)
             {
                 throw new JsonRpcException($"Bad Content-Length [{contentLength}]", this);
             }
@@ -107,7 +104,7 @@ namespace Tochka.JsonRpc.Client.Models
                 return;
             }
 
-            if (!(SingleCall is UntypedRequest request))
+            if (SingleCall is not UntypedRequest request)
             {
                 throw new JsonRpcException($"Received response but call was not request or batch", this);
             }
@@ -148,7 +145,7 @@ namespace Tochka.JsonRpc.Client.Models
                 throw new JsonRpcException($"Batch JSON Rpc response has wrong count [{batchResponse.Count}], expected [{ExpectedBatchResponseCount}]", this);
             }
 
-            if (batchResponse.Any(x => x.Jsonrpc != JsonRpcConstants.Version))
+            if (batchResponse.Any(static x => x.Jsonrpc != JsonRpcConstants.Version))
             {
                 throw new JsonRpcException($"Batch JSON Rpc response has item with invalid version, expected [{JsonRpcConstants.Version}]", this);
             }
@@ -244,9 +241,9 @@ namespace Tochka.JsonRpc.Client.Models
             return sb.ToString();
         }
 
-        private string GetStringWithLimit(string str) =>
+        private static string GetStringWithLimit(string str) =>
             string.IsNullOrEmpty(str) || str.Length <= JsonRpcConstants.LogStringLimit
                 ? str
-                : str.Substring(0, JsonRpcConstants.LogStringLimit - 1);
+                : str[..JsonRpcConstants.LogStringLimit];
     }
 }

@@ -5,48 +5,53 @@ namespace Tochka.JsonRpc.Common.Models.Id
     [ExcludeFromCodeCoverage]
     public class NumberRpcId : IRpcId, IEquatable<NumberRpcId>
     {
-        public long Number { get; }
+        public long NumberValue { get; }
 
-        public NumberRpcId(long value)
+        public NumberRpcId(long value) => NumberValue = value;
+
+        public override string ToString() => $"{NumberValue}";
+
+        public bool Equals(NumberRpcId? other)
         {
-            Number = value;
+            if (ReferenceEquals(null, other))
+            {
+                return false;
+            }
+
+            if (ReferenceEquals(this, other))
+            {
+                return true;
+            }
+
+            return NumberValue == other.NumberValue;
         }
 
-        public override string ToString() => $"{Number}";
+        public bool Equals(IRpcId? other) => Equals(other as NumberRpcId);
 
-        public bool Equals(NumberRpcId other)
+        public override bool Equals(object? obj)
         {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
-            return Number == other.Number;
-        }
+            if (ReferenceEquals(null, obj))
+            {
+                return false;
+            }
 
-        public bool Equals(IRpcId other)
-        {
-            return Equals(other as NumberRpcId);
-        }
+            if (ReferenceEquals(this, obj))
+            {
+                return true;
+            }
 
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (obj.GetType() != GetType())
+            {
+                return false;
+            }
+
             return Equals((NumberRpcId) obj);
         }
 
-        public override int GetHashCode()
-        {
-            return Number.GetHashCode();
-        }
+        public override int GetHashCode() => NumberValue.GetHashCode();
 
-        public static bool operator ==(NumberRpcId left, NumberRpcId right)
-        {
-            return Equals(left, right);
-        }
+        public static bool operator ==(NumberRpcId left, NumberRpcId right) => Equals(left, right);
 
-        public static bool operator !=(NumberRpcId left, NumberRpcId right)
-        {
-            return !Equals(left, right);
-        }
+        public static bool operator !=(NumberRpcId left, NumberRpcId right) => !Equals(left, right);
     }
 }

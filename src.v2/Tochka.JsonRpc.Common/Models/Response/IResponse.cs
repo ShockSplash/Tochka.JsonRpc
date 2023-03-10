@@ -5,7 +5,7 @@ namespace Tochka.JsonRpc.Common.Models.Response
 {
     public interface IResponse
     {
-        IRpcId Id { get; set; }
+        IRpcId? Id { get; set; }
 
         string Jsonrpc { get; set; }
     }

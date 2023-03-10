@@ -13,7 +13,7 @@ namespace Tochka.JsonRpc.Common.Models.Response.Errors
 
         // This may be omitted
         [SuppressMessage("Naming", "CA1721:Имена свойств не должны совпадать с именами методов get")]
-        public T Data { get; set; }
+        public T? Data { get; set; }
 
         public object GetData()
         {

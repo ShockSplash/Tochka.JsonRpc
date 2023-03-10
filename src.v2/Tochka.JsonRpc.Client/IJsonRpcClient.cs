@@ -1,8 +1,4 @@
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
+using JetBrains.Annotations;
 using Tochka.JsonRpc.Client.Models;
 using Tochka.JsonRpc.Common.Models.Id;
 using Tochka.JsonRpc.Common.Models.Request;
@@ -10,6 +6,7 @@ using Tochka.JsonRpc.Common.Serializers;
 
 namespace Tochka.JsonRpc.Client
 {
+    [PublicAPI]
     public interface IJsonRpcClient
     {
         /// <summary>
@@ -147,7 +144,7 @@ namespace Tochka.JsonRpc.Client
         /// <exception cref="JsonRpcException">When HTTP status code is not 200, body deserialzed as single response, response count does not match requests in batch</exception>
         /// <exception cref="Newtonsoft.Json.JsonException">When reading or deserializing JSON from body failed</exception>
         /// <exception cref="System.ArgumentException">When requestUrl starts with '/'</exception>
-        Task<IBatchJsonRpcResult> SendBatch(string requestUrl, IEnumerable<ICall> calls, CancellationToken cancellationToken);
+        Task<IBatchJsonRpcResult?> SendBatch(string requestUrl, IEnumerable<ICall> calls, CancellationToken cancellationToken);
 
         /// <summary>
         /// Send batch of requests or notifications to BaseUrl. Expects HTTP 200 with batch JSON Rpc response if batch contains at least one request
@@ -158,7 +155,7 @@ namespace Tochka.JsonRpc.Client
         /// <exception cref="JsonRpcException">When HTTP status code is not 200, body deserialzed as single response, response count does not match requests in batch</exception>
         /// <exception cref="Newtonsoft.Json.JsonException">When reading or deserializing JSON from body failed</exception>
         /// <exception cref="System.ArgumentException">When requestUrl starts with '/'</exception>
-        Task<IBatchJsonRpcResult> SendBatch(IEnumerable<ICall> calls, CancellationToken cancellationToken);
+        Task<IBatchJsonRpcResult?> SendBatch(IEnumerable<ICall> calls, CancellationToken cancellationToken);
 
         /// <summary>
         /// Send request or notification to given url. Does not check or parse HTTP response
@@ -168,7 +165,6 @@ namespace Tochka.JsonRpc.Client
         /// <param name="cancellationToken"></param>
         /// <returns>Raw HTTP response</returns>
         /// <exception cref="System.ArgumentException">When requestUrl starts with '/'</exception>
-        [SuppressMessage("Naming", "CA1716:Идентификаторы не должны совпадать с ключевыми словами")]
         Task<HttpResponseMessage> Send(string requestUrl, ICall call, CancellationToken cancellationToken);
 
         /// <summary>
@@ -177,7 +173,6 @@ namespace Tochka.JsonRpc.Client
         /// <param name="call">JSON Rpc request or notification</param>
         /// <param name="cancellationToken"></param>
         /// <returns>Raw HTTP response</returns>
-        [SuppressMessage("Naming", "CA1716:Идентификаторы не должны совпадать с ключевыми словами")]
         Task<HttpResponseMessage> Send(ICall call, CancellationToken cancellationToken);
 
         /// <summary>

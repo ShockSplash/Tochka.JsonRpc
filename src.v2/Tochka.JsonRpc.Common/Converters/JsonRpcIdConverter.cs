@@ -5,6 +5,7 @@ using Tochka.JsonRpc.Common.Models.Id;
 
 namespace Tochka.JsonRpc.Common.Converters;
 
+/// <inheritdoc />
 /// <summary>
 /// Handle dumb rule of Id as string/number/null for requests and responses
 /// </summary>
@@ -15,10 +16,10 @@ public class JsonRpcIdConverter : JsonConverter<IRpcId>
         switch (value)
         {
             case NumberRpcId numberRpcId:
-                writer.WriteNumberValue(numberRpcId.Number);
+                writer.WriteNumberValue(numberRpcId.NumberValue);
                 break;
             case StringRpcId stringRpcId:
-                writer.WriteStringValue(stringRpcId.String);
+                writer.WriteStringValue(stringRpcId.StringValue);
                 break;
             case null:
                 writer.WriteNullValue();

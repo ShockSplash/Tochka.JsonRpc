@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using Tochka.JsonRpc.Common.Models.Id;
 using Tochka.JsonRpc.Common.Models.Response;
@@ -7,7 +8,7 @@ using Tochka.JsonRpc.Common.Serializers;
 
 namespace Tochka.JsonRpc.Client.Models
 {
-    public class BatchJsonRpcResult : IBatchJsonRpcResult
+    internal class BatchJsonRpcResult : IBatchJsonRpcResult
     {
         private readonly IJsonRpcCallContext context;
         private readonly HeaderJsonRpcSerializer headerJsonRpcSerializer;
@@ -21,17 +22,16 @@ namespace Tochka.JsonRpc.Client.Models
             {
                 throw new ArgumentOutOfRangeException(nameof(context), "Expected batch response");
             }
-            this.responses = CreateDictionary(context.BatchResponse);
+
+            responses = CreateDictionary(context.BatchResponse);
             this.headerJsonRpcSerializer = headerJsonRpcSerializer;
             this.serializer = serializer;
         }
 
-        private static Dictionary<IRpcId, IResponse> CreateDictionary(List<IResponse> items)
-        {
-            return items.ToDictionary(x => x.Id ?? NullId, x => x);
-        }
+        private static Dictionary<IRpcId, IResponse> CreateDictionary(IEnumerable<IResponse>? items) =>
+            items?.ToDictionary(static x => x.Id ?? NullId, static x => x) ?? new Dictionary<IRpcId, IResponse>();
 
-        public T GetResponseOrThrow<T>(IRpcId id)
+        public T? GetResponseOrThrow<T>(IRpcId? id)
         {
             if (!TryGetValue(id, out var response))
             {
@@ -50,17 +50,17 @@ namespace Tochka.JsonRpc.Client.Models
             }
         }
 
-        public T AsResponse<T>(IRpcId id)
+        public T? AsResponse<T>(IRpcId? id)
         {
             TryGetValue(id, out var response);
-            if (response is UntypedResponse untypedResponse)
+            return response switch
             {
-                return untypedResponse.Result.Deserialize<T>(serializer.Settings);
-            }
-            return default(T);
+                UntypedResponse untypedResponse => untypedResponse.Result.Deserialize<T>(serializer.Settings),
+                _ => default
+            };
         }
 
-        public bool HasError(IRpcId id)
+        public bool HasError(IRpcId? id)
         {
             if (!TryGetValue(id, out var response))
             {
@@ -70,55 +70,46 @@ namespace Tochka.JsonRpc.Client.Models
             return response is UntypedErrorResponse;
         }
 
-        public Error<JsonDocument> AsAnyError(IRpcId id)
+        public Error<JsonDocument>? AsAnyError(IRpcId? id)
         {
             TryGetValue(id, out var response);
-            if (response is UntypedErrorResponse untypedErrorResponse)
+            return response switch
             {
-                return untypedErrorResponse.Error;
-            }
-
-            return null;
+                UntypedErrorResponse untypedErrorResponse => untypedErrorResponse.Error,
+                _ => null
+            };
         }
 
-        public Error<T> AsTypedError<T>(IRpcId id)
+        public Error<T>? AsTypedError<T>(IRpcId? id)
         {
             TryGetValue(id, out var response);
-            if (response is UntypedErrorResponse untypedErrorResponse)
+            return response switch
             {
-                var error = untypedErrorResponse.Error;
-                var data = GetData<T>(error);
-                return new Error<T>()
+                UntypedErrorResponse untypedErrorResponse => new Error<T>
                 {
-                    Code = error.Code,
-                    Message = error.Message,
-                    Data = data
-                };
-            }
-
-            return null;
+                    Code = untypedErrorResponse.Error.Code,
+                    Message = untypedErrorResponse.Error.Message,
+                    Data = GetData<T>(untypedErrorResponse.Error)
+                },
+                _ => null
+            };
         }
 
-        public Error<ExceptionInfo> AsErrorWithExceptionInfo(IRpcId id)
-        {
-            return AsTypedError<ExceptionInfo>(id);
-        }
+        public Error<ExceptionInfo>? AsErrorWithExceptionInfo(IRpcId? id) => AsTypedError<ExceptionInfo>(id);
 
-        private bool TryGetValue(IRpcId id, out IResponse response)
-        {
-            return responses.TryGetValue(id ?? NullId, out response);
-        }
+        private bool TryGetValue(IRpcId? id, [NotNullWhen(true)] out IResponse? response) =>
+            responses.TryGetValue(id ?? NullId, out response);
 
-        private T GetData<T>(Error<JsonDocument> error)
+        private T? GetData<T>(Error<JsonDocument> error)
         {
             if (error.Data == null)
             {
                 // if data was not present at all, do not throw
-                return default(T);
+                return default;
             }
 
             var data = error.Data.Deserialize<T>(serializer.Settings);
-            if (data.Equals(default(T)))
+            if (data.Equals(default(T))) // ask Rast - что за серверная ошибка?
             {
                 // if user serializer failed: maybe this is server error, try header serializer
                 data = error.Data.Deserialize<T>(headerJsonRpcSerializer.Settings);
@@ -130,27 +121,19 @@ namespace Tochka.JsonRpc.Client.Models
         /// <summary>
         /// Dummy value for storing responses in dictionary
         /// </summary>
-        internal static IRpcId NullId = new NullRpcId();
+        private static readonly IRpcId NullId = new NullRpcId();
 
+        /// <inheritdoc cref="Tochka.JsonRpc.Common.Models.Id.IRpcId" />
         /// <summary>
         /// Dummy id type for storing responses in dictionary
         /// </summary>
         private class NullRpcId : IRpcId, IEquatable<NullRpcId>
         {
-            public bool Equals(NullRpcId other)
-            {
-                return !ReferenceEquals(null, other);
-            }
+            public bool Equals(NullRpcId? other) => !ReferenceEquals(null, other); // равен всему кроме null? ask Rast
 
-            public bool Equals(IRpcId other)
-            {
-                return Equals(other as NullRpcId);
-            }
+            public bool Equals(IRpcId? other) => Equals(other as NullRpcId);
 
-            public override bool Equals(object obj)
-            {
-                return Equals(obj as NullRpcId);
-            }
+            public override bool Equals(object? obj) => Equals(obj as NullRpcId);
         }
     }
 }

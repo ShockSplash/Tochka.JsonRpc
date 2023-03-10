@@ -7,15 +7,14 @@ namespace Tochka.JsonRpc.Common.Converters
 {
     public class ResponseConverter : JsonConverter<IResponse>
     {
-        public override void Write(Utf8JsonWriter writer, IResponse value, JsonSerializerOptions options) => throw
-            // NOTE: used in client to parse responses, no need for serialization
-            new InvalidOperationException();
+        // NOTE: used in client to parse responses, no need for serialization
+        public override void Write(Utf8JsonWriter writer, IResponse value, JsonSerializerOptions options) => throw new InvalidOperationException();
 
         public override IResponse? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) =>
             CheckProperties(reader) switch
             {
                 // "Id is REQUIRED. If there was an error in detecting the id in the Request object (e.g. Parse error/Invalid Request), it MUST be Null."
-                // (JToken.Null, not actual null)
+                // (JsonTokenType.Null, not actual null)
                 { HasId: false } => throw new ArgumentException($"JSON Rpc response does not have [{JsonRpcConstants.IdProperty}] property"),
                 { HasResult: true, HasError: false } => JsonSerializer.Deserialize<UntypedResponse>(ref reader, options),
                 { HasResult: false, HasError: true } => JsonSerializer.Deserialize<UntypedErrorResponse>(ref reader, options),
@@ -27,8 +26,14 @@ namespace Tochka.JsonRpc.Common.Converters
             var hasId = false;
             var hasError = false;
             var hasResult = false;
+            var initialDepth = propertyReader.CurrentDepth;
             while (propertyReader.Read())
             {
+                if (propertyReader.TokenType == JsonTokenType.EndObject && propertyReader.CurrentDepth == initialDepth)
+                {
+                    break;
+                }
+
                 if (propertyReader.TokenType != JsonTokenType.PropertyName)
                 {
                     continue;

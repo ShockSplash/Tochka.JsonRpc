@@ -43,7 +43,7 @@ namespace Tochka.JsonRpc.Common.Tests.Models
         public void Test_StringRpcId_AllowsEmpty()
         {
             var value = new StringRpcId(string.Empty);
-            value.String.Should().Be(string.Empty);
+            value.StringValue.Should().Be(string.Empty);
         }
 
         [Test]

@@ -6,9 +6,7 @@ namespace Tochka.JsonRpc.Common.Models.Request.Untyped
     [ExcludeFromCodeCoverage]
     public class UntypedNotification : Notification<JsonDocument>, IUntypedCall
     {
-        /// <summary>
-        /// Set on deserialization. JSON content corresponding to this object
-        /// </summary>
+        /// <inheritdoc />
         public string RawJson { get; set; }
     }
 }
