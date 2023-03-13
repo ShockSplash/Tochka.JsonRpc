@@ -1,0 +1,13 @@
+﻿{
+  "jsonrpc": "2.0",
+  "error": {
+    "code": 456,
+    "message": "errorMessage",
+    "data": {
+      "boolField": true,
+      "result": "123",
+      "intField": 123
+    }
+  },
+  "id": 123
+}

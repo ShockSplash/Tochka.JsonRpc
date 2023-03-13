@@ -29,12 +29,20 @@ namespace Tochka.JsonRpc.Common.Converters
             var initialDepth = propertyReader.CurrentDepth;
             while (propertyReader.Read())
             {
-                if (propertyReader.TokenType == JsonTokenType.EndObject && propertyReader.CurrentDepth == initialDepth)
+                var tokenType = propertyReader.TokenType;
+                var currentDepth = propertyReader.CurrentDepth;
+                if (tokenType == JsonTokenType.EndObject && currentDepth == initialDepth)
                 {
                     break;
                 }
 
-                if (propertyReader.TokenType != JsonTokenType.PropertyName)
+                if (tokenType is JsonTokenType.StartObject or JsonTokenType.StartArray && currentDepth == initialDepth + 1)
+                {
+                    propertyReader.Skip();
+                    continue;
+                }
+
+                if (tokenType != JsonTokenType.PropertyName)
                 {
                     continue;
                 }

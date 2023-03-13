@@ -258,6 +258,31 @@ internal class DeserializationTests
     }
 
     [Test]
+    public void ErrorWithResultFieldInDataResponse()
+    {
+        var json = GetFileContent("ErrorWithResultFieldInDataResponse.json");
+
+        var deserialized = JsonSerializer.Deserialize<IResponseWrapper>(json, headerJsonRpcSerializer.Settings);
+
+        deserialized.Should().NotBeNull();
+        deserialized.Should().BeOfType<SingleResponseWrapper>();
+        var singleResponse = (SingleResponseWrapper) deserialized;
+        var response = singleResponse.Single;
+        response.Should().BeOfType<UntypedErrorResponse>();
+        response.Jsonrpc.Should().Be("2.0");
+        response.Id.Should().BeOfType<NumberRpcId>();
+        var intId = (NumberRpcId) response.Id;
+        intId.NumberValue.Should().Be(123);
+        var error = (UntypedErrorResponse) response;
+        error.Error.Code.Should().Be(456);
+        error.Error.Message.Should().Be("errorMessage");
+        var errorData = error.Error.Data.Deserialize<ErrorWithResult>(camelCaseJsonRpcSerializer.Settings);
+        errorData.BoolField.Should().BeTrue();
+        errorData.Result.Should().Be("123");
+        errorData.IntField.Should().Be(123);
+    }
+
+    [Test]
     public void IntIdErrorResponse()
     {
         var json = GetFileContent("IntIdErrorResponse.json");
@@ -341,6 +366,29 @@ internal class DeserializationTests
         response.Should().BeOfType<UntypedResponse>();
         response.Jsonrpc.Should().Be("2.0");
         response.Id.Should().BeNull();
+    }
+
+    [Test]
+    public void ResultWithErrorFieldInDataResponse()
+    {
+        var json = GetFileContent("ResultWithErrorFieldInDataResponse.json");
+
+        var deserialized = JsonSerializer.Deserialize<IResponseWrapper>(json, headerJsonRpcSerializer.Settings);
+
+        deserialized.Should().NotBeNull();
+        deserialized.Should().BeOfType<SingleResponseWrapper>();
+        var singleResponse = (SingleResponseWrapper) deserialized;
+        var response = singleResponse.Single;
+        response.Should().BeOfType<UntypedResponse>();
+        response.Jsonrpc.Should().Be("2.0");
+        response.Id.Should().BeOfType<NumberRpcId>();
+        var intId = (NumberRpcId) response.Id;
+        intId.NumberValue.Should().Be(123);
+        var result = (UntypedResponse) response;
+        var resultData = result.Result.Deserialize<ResultWithError>(camelCaseJsonRpcSerializer.Settings);
+        resultData.BoolField.Should().BeTrue();
+        resultData.Error.Should().Be("123");
+        resultData.IntField.Should().Be(123);
     }
 
     [Test]
@@ -449,4 +497,8 @@ internal class DeserializationTests
 
     private static string GetFileContent(string fileName) => File.ReadAllText(Path.Combine(TestContext.CurrentContext.TestDirectory, "TestData", fileName));
     private const double Precision = 0.001;
+
+    private record ErrorWithResult(bool BoolField, string Result, int IntField);
+
+    private record ResultWithError(bool BoolField, string Error, int IntField);
 }

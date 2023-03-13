@@ -1,0 +1,9 @@
+﻿{
+  "jsonrpc": "2.0",
+  "result": {
+    "boolField": true,
+    "error": "123",
+    "intField": 123
+  },
+  "id": 123
+}
